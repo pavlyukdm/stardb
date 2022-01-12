@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 
+import Spinner from '../spinner';
+import ErrorIndicator from '../error-indicator';
+import SwapiService from '../../services/swapi-service';
+
 import './random-planet.css';
-import {SwapiService} from "../../services/swapi-service";
-import Spinner from "../spinner";
-import ErrorIndicator from "../error-indicator";
 
 export default class RandomPlanet extends Component {
 
@@ -11,65 +12,70 @@ export default class RandomPlanet extends Component {
 
   state = {
     planet: {},
-    loading: true,
-    error: false,
+    loading: true
+  };
+
+  componentDidMount() {
+    this.updatePlanet();
+    this.interval = setInterval(this.updatePlanet, 10000);
   }
 
-  constructor() {
-    super();
-    this.updatePlanet();
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   onPlanetLoaded = (planet) => {
     this.setState({
       planet,
       loading: false,
-    })
-  }
+      error: false
+    });
+  };
 
-  onError = (e) => {
+  onError = (err) => {
     this.setState({
       error: true,
-      loading: false,
-    })
-    console.log('Error: ', e)
-  }
+      loading: false
+    });
+  };
 
-  updatePlanet () {
-    const id = 4;
+  updatePlanet = () => {
+    const id = Math.floor(Math.random()*17) + 2;
     this.swapiService
       .getPlanet(id)
       .then(this.onPlanetLoaded)
-      .catch((e) => this.onError(e))
-
-  }
+      .catch(this.onError);
+  };
 
   render() {
     const { planet, loading, error } = this.state;
-    const hasData = !(loading || error)
+
+    const hasData = !(loading || error);
+
+    const errorMessage = error ? <ErrorIndicator/> : null;
     const spinner = loading ? <Spinner /> : null;
-    const errorIndicator = error ? <ErrorIndicator /> : null;
-    const planetView = hasData ? <PlanetView planet={planet} /> : null;
+    const content = hasData ? <PlanetView planet={planet}/> : null;
 
     return (
       <div className="random-planet jumbotron rounded">
+        {errorMessage}
         {spinner}
-        {errorIndicator}
-        {planetView}
+        {content}
       </div>
-
     );
   }
 }
 
 const PlanetView = ({ planet }) => {
-  const {
-    id, name, diameter, population, rotationPeriod
-  } = planet
+
+  const { id, name, population,
+    rotationPeriod, diameter } = planet;
+
   return (
-    <>
-      <img className="planet-image" alt="planet"
-           src={`https://starwars-visualguide.com/assets/img/planets/${id}.jpg`}/>
+    <React.Fragment>
+      <img className="planet-image"
+           src={`https://starwars-visualguide.com/assets/img/planets/${id}.jpg`}
+           alt="planet" />
       <div>
         <h4>{name}</h4>
         <ul className="list-group list-group-flush">
@@ -87,6 +93,9 @@ const PlanetView = ({ planet }) => {
           </li>
         </ul>
       </div>
-    </>
-  )
-}
+    </React.Fragment>
+  );
+};
+
+
+
