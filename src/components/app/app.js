@@ -63,6 +63,7 @@ export default class App extends Component {
 						<ItemList
 							onItemSelected={this.onPersonSelected}
 							getData={this.swapiService.getAllPlanets}
+							renderItem={({ name, diameter }) => `${name} - ${diameter}`}
 						 />
 					</div>
 					<div className="col-md-6">
@@ -75,6 +76,7 @@ export default class App extends Component {
 						<ItemList
 							onItemSelected={this.onPersonSelected}
 							getData={this.swapiService.getAllStarships}
+							renderItem={({ name, length }) => `${name} - ${length}`}
 						 />
 					</div>
 					<div className="col-md-6">
