@@ -16,8 +16,6 @@ export default class ItemList extends Component {
           itemList
         });
       });
-
-			console.log(this.props.getData());
   }
 
   renderItems(arr) {
@@ -50,7 +48,6 @@ export default class ItemList extends Component {
     return (
       <ul className="item-list list-group">
         {items}
-				{'this.props.children: '}
       </ul>
     );
   }
